@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-12-24T15:44:03.772Z</updated>
+  <updated>2018-12-25T14:05:33.817Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2018/12/25/animator/"/>
+    <id>http://yoursite.com/2018/12/25/animator/</id>
+    <published>2018-12-25T14:05:33.701Z</published>
+    <updated>2018-12-25T14:05:33.817Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="属性动画"><a href="#属性动画" class="headerlink" title="属性动画"></a>属性动画</h2><h5 id="写在前面的话"><a href="#写在前面的话" class="headerlink" title="写在前面的话"></a>写在前面的话</h5><p>在属性动画之前，Andoid提供了帧动画和View动画；View动画包括AlphaAnimation、RotateAnimation、TranslateAnimation、ScaleAnimation；并提供了AnimationSet动画集合来混合使用多种动画。</p><h3 id="1-ObjectAnimator"><a href="#1-ObjectAnimator" class="headerlink" title="1.ObjectAnimator"></a>1.ObjectAnimator</h3><p>创建一个 <strong>ObjcetAnimator</strong> 只需要通过其静态工厂类直接返回一个<strong>ObjectAnimator</strong>对象即可。参数包括一个对象和对象的属性名字（<strong>这个属性必须要有set和get方法</strong>），其内部会通过反射机制去修改对象的属性值。例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ObjectAnimator anim = ObjectAnimator.ofFloat(mView,&quot;translationX&quot;,200);</span><br><span class="line">anim.setDuration(1000);</span><br><span class="line">anim.start();</span><br></pre></td></tr></table></figure></p><p>最后一个参数是一个可变的float类型数组。这跟View动画一样，可以设置时长、插值器等属性。</p><h5 id="常用的可以直接使用属性动画的属性名称："><a href="#常用的可以直接使用属性动画的属性名称：" class="headerlink" title="常用的可以直接使用属性动画的属性名称："></a>常用的可以直接使用属性动画的属性名称：</h5><ul><li><strong>translationX</strong> 和 <strong>translationY</strong>：沿着X、Y轴进行平移。</li><li><strong>rotation</strong>、<strong>rotationX</strong>、<strong>rotationY</strong>：用来围绕View的支点进行旋转。</li><li><strong>PrivotX</strong> 和 <strong>PrivotY</strong>：控制View对象的支点位置，围绕这个支点进行旋转和缩进变化。</li><li><strong>alpha</strong>：透明度，默认是1（不透明），0代表完全透明。</li><li><strong>x</strong> 和 <strong>y</strong>：描述View对象在其容器中的最终位置。</li></ul><h3 id="2-ValueAnimator"><a href="#2-ValueAnimator" class="headerlink" title="2.ValueAnimator"></a>2.ValueAnimator</h3><p><strong>ValueAnimator</strong> 不提供任何动画效果，它像是一个数值发生器，用来产生一定规律的数值，从而使调用者控制动画的实现过程。<br>通常情况下，在 <strong>ValueAnimator</strong> 的  <strong>AnimatorUpdateListener</strong> 中监听数值的变化。如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ValueAnimator valueAnim = ValueAnimator.ofFloat(0,100);</span><br><span class="line">valueAnim.setTarget(view);</span><br><span class="line">valueAnim.setDuration(1000).start();</span><br><span class="line">valueAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() &#123;</span><br><span class="line">@Override</span><br><span class="line">    public void onAnimationUpdate(ValueAnimator animation) &#123;</span><br><span class="line">                Float f = animation.getAnimatedFraction();</span><br><span class="line">                &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p><h3 id="3-动画的监听"><a href="#3-动画的监听" class="headerlink" title="3.动画的监听"></a>3.动画的监听</h3><p>动画总共分为<strong>start、repeat、end、cancel</strong> 四个过程。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">ObjectAnimator anim = ObjectAnimator.ofFloat(view,&quot;alpha&quot;,1.5f);</span><br><span class="line">anim.addListener(new Animator.AnimatorListener() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void onAnimationStart(Animator animation) &#123;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void onAnimationEnd(Animator animation) &#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void onAnimationCancel(Animator animation) &#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void onAnimationRepeat(Animator animation) &#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure></p><p>多数情况，我们只需要关注 <strong>onAnimationEnd</strong> 方法，所以Android也提供了 <strong>AnimatorListenerAdapter()</strong> ，只需要对必要的事件进行监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">anim.addListener(new AnimatorListenerAdapter() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void onAnimationEnd(Animator animation) &#123;</span><br><span class="line">                super.onAnimationEnd(animation);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure></p><h3 id="4-组合动画-AnimatorSet"><a href="#4-组合动画-AnimatorSet" class="headerlink" title="4.组合动画-AnimatorSet"></a>4.组合动画-AnimatorSet</h3><p><strong>AnimatorSet.Builder</strong> 包括以下4个方法：</p><ul><li>after（Animator anim）：将现有动画插入到传入的动画之后执行。</li><li>after（long delay）：将现有动画延迟指定毫秒后执行。</li><li>before（Animator anim）：将现有动画插入到传入的动画之前执行。</li><li>with（Animator anim）：将现有动画和传入的动画同时执行。<br>举个栗子：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ObjectAnimator anim1 = ObjectAnimator.ofFloat(view,&quot;alpha&quot;,1.5f);</span><br><span class="line">ObjectAnimator anim2 = ObjectAnimator.ofFloat(view,&quot;translationX&quot;,0.0f,200.0f,0.0f);</span><br><span class="line">ObjectAnimator anim3 = ObjectAnimator.ofFloat(view,&quot;scaleX&quot;,1.0f,2.0f);</span><br><span class="line">AnimatorSet set = new AnimatorSet();</span><br><span class="line">set.setDuration(2000);</span><br><span class="line">set.play(anim1).with(anim2).after(anim3);</span><br><span class="line">set.start();</span><br></pre></td></tr></table></figure></li></ul><h3 id="5-组合动画-PropertyValuesHolder"><a href="#5-组合动画-PropertyValuesHolder" class="headerlink" title="5.组合动画-PropertyValuesHolder"></a>5.组合动画-PropertyValuesHolder</h3><p>除了以上的 <strong>AnimatorSet</strong> ，还可以用 <strong>PropertyValuesHolder</strong> 来实现组合动画，只是说没有上面的那么丰富。因为 <strong>PropertyValuesHolder</strong> 只能是多个动画同时一起执行。<br>具体代码如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PropertyValuesHolder holder1 = PropertyValuesHolder.ofFloat(&quot;scaleX&quot;,1.0f,1.5f);</span><br><span class="line">PropertyValuesHolder holder2 = PropertyValuesHolder.ofFloat(&quot;rotationX&quot;,0.0f,90.0f,0.0f);</span><br><span class="line">ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(view,holder1,holder2);</span><br><span class="line">anim.setDuration(2000).start();</span><br></pre></td></tr></table></figure></p><h3 id="6-在XML中使用属性动画"><a href="#6-在XML中使用属性动画" class="headerlink" title="6.在XML中使用属性动画"></a>6.在XML中使用属性动画</h3><p>在 <strong>res</strong> 文件中新建一个 <strong>animator</strong> 文件，在里面新建一个 <strong>scale.xml</strong> ，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;objectAnimator xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:duration=&quot;3000&quot;</span><br><span class="line">    android:propertyName=&quot;scaleX&quot;</span><br><span class="line">    android:valueFrom=&quot;1.0&quot;</span><br><span class="line">    android:valueTo=&quot;2.0&quot;</span><br><span class="line">    android:valueType=&quot;floatType&quot;&gt;</span><br><span class="line">&lt;/objectAnimator&gt;</span><br></pre></td></tr></table></figure></p><p>在程序中引用上述定义的属性动画：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Animator animator = AnimatorInflater.loadAnimator(this,R.animator.scale);</span><br><span class="line">animator.setTarget(view);</span><br><span class="line">animator.start();</span><br></pre></td></tr></table></figure></p><h5 id="属性动画的学习到此结束…"><a href="#属性动画的学习到此结束…" class="headerlink" title="属性动画的学习到此结束…"></a>属性动画的学习到此结束…</h5>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;属性动画&quot;&gt;&lt;a href=&quot;#属性动画&quot; class=&quot;headerlink&quot; title=&quot;属性动画&quot;&gt;&lt;/a&gt;属性动画&lt;/h2&gt;&lt;h5 id=&quot;写在前面的话&quot;&gt;&lt;a href=&quot;#写在前面的话&quot; class=&quot;headerlink&quot; title=&quot;写在前面的
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title></title>
@@ -32,28 +53,6 @@
         &lt;h1 id=&quot;第一次写作&quot;&gt;&lt;a href=&quot;#第一次写作&quot; class=&quot;headerlink&quot; title=&quot;第一次写作&quot;&gt;&lt;/a&gt;第一次写作&lt;/h1&gt;&lt;ul&gt;
 &lt;li&gt;Android攻城狮&lt;/li&gt;
 &lt;li&gt;联系方式：&lt;a href=&quot;mailto:ebaryice@gm
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2018/12/24/HelloWorld/"/>
-    <id>http://yoursite.com/2018/12/24/HelloWorld/</id>
-    <published>2018-12-24T13:48:26.930Z</published>
-    <updated>2018-12-24T15:45:01.266Z</updated>
-    
-    <content type="html"><![CDATA[<hr><h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;hr&gt;
-&lt;h2 id=&quot;Hello-World&quot;&gt;&lt;a href=&quot;#Hello-World&quot; class=&quot;headerlink&quot; title=&quot;Hello World&quot;&gt;&lt;/a&gt;Hello World&lt;/h2&gt;
       
     
     </summary>
